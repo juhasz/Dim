@@ -1,3 +1,8 @@
+" default global variables
+if !exists('g:DrupalOpenSearchIn')
+  let g:DrupalOpenSearchIn = 'vne'
+endif
+
 " functions
 function! DrupalFuncSearch(func)
   let l:func = a:func
@@ -26,12 +31,19 @@ function! DrupalFuncSearch(func)
 
   " RegularExpression for search
   let l:regExp = '^function' . l:expBeg . l:func . l:expEnd . '('
-  exec 'silent grep! -R "' . l:regExp . '" ' . b:DrupalRoot
+  lclose
+  if !exists('w:DrupalWindowIsSearchWindow') || !w:DrupalWindowIsSearchWindow
+    exec g:DrupalOpenSearchIn
+    let w:DrupalWindowIsSearchWindow = 1
+    call DrupalSetRootDir()
+  endif
+  exec 'silent lgrep -R "' . l:regExp . '" ' . w:DrupalRoot
+  lopen
 endfunction
 
 function! DrupalSetRootDir(...)
   if exists('a:1')
-    let b:DrupalRoot = a:1
+    let w:DrupalRoot = a:1
     return 0
   endif
   " get the working directory
@@ -56,7 +68,7 @@ function! DrupalSetRootDir(...)
     endif
   endwhile
 
-  let b:DrupalRoot = l:dir
+  let w:DrupalRoot = l:dir
 endfunction
 
 " commands
