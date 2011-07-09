@@ -1,6 +1,6 @@
 " default global variables
-if !exists('g:DrupalOpenSearchIn')
-  let g:DrupalOpenSearchIn = 'vne'
+if !exists('g:DrupalOpenSearchWith')
+  let g:DrupalOpenSearchWith = 'vne'
 endif
 
 " functions
@@ -33,7 +33,7 @@ function! DrupalFuncSearch(func)
   let l:regExp = '^function' . l:expBeg . l:func . l:expEnd . '('
   lclose
   if !exists('w:DrupalWindowIsSearchWindow') || !w:DrupalWindowIsSearchWindow
-    exec g:DrupalOpenSearchIn
+    exec g:DrupalOpenSearchWith
     let w:DrupalWindowIsSearchWindow = 1
     call DrupalSetRootDir()
   endif
