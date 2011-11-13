@@ -1,58 +1,22 @@
-" default global variables
-if !exists('g:DrupalOpenSearchWith')
-  let g:DrupalOpenSearchWith = 'vne'
-endif
-
 " functions
-function! DrupalFuncSearch(func)
-  let l:func = a:func
-
-  " remove quote paris from function name
-  let l:pairs = ['"', "'", '/']
-  if l:func[0] == l:func[len(l:func) - 1] && index(l:pairs, l:func[0]) >= 0
-    let l:func = l:func[1:-2]
-  endif
-
-  " set the beginning of function name, to work with or without beginning '^'
-  if l:func[0] == '^'
-    let l:expBeg = ' '
-    let l:func = l:func[1:-1]
-  else
-    let l:expBeg = '[^(]*'
-  endif
-
-  " set the end of function name, to work with or without trailing '$'
-  if l:func[len(l:func) - 1] == '$'
-    let l:expEnd = ''
-    let l:func = l:func[0:-2]
-  else
-    let l:expEnd = '[^(]*'
-  endif
-
-  " RegularExpression for search
-  let l:regExp = '^function' . l:expBeg . l:func . l:expEnd . '('
-  lclose
-  if !exists('w:DrupalWindowIsSearchWindow') || !w:DrupalWindowIsSearchWindow
-    exec g:DrupalOpenSearchWith
-    let w:DrupalWindowIsSearchWindow = 1
-    call DrupalSetRootDir()
-  endif
-  exec 'silent lgrep -R "' . l:regExp . '" ' . w:DrupalRoot
-  lopen
-endfunction
-
 function! DrupalSetRootDir(...)
   if exists('a:1')
-    let w:DrupalRoot = a:1
+    let b:DrupalRoot = a:1
     return 0
   endif
-  " get the working directory
-  let l:dir = getcwd()
+  " get the file directory
+  let l:dir = expand('%:p:h')
   " search for a Drupal root in the parent directories
-  while !file_readable(l:dir . '/includes/bootstrap.inc')
+  while 1
+
+    if file_readable(l:dir . '/index.php') && (file_readable(l:dir . '/core/includes/bootstrap.inc') || file_readable(l:dir . '/includes/bootstrap.inc'))
+      break
+    endif
+
     let l:pathList = split(l:dir, '/')
     let l:dir = ''
     unlet l:pathList[-1]
+
     " if no more parent directories, set the default Drupal directory
     if len(l:pathList) > 0
       for l:d in l:pathList
@@ -66,11 +30,49 @@ function! DrupalSetRootDir(...)
       endif
       break
     endif
+
   endwhile
 
-  let w:DrupalRoot = l:dir
+  let b:DrupalRoot = l:dir
+endfunction
+
+function! DrupalCdDrupalRoot(...)
+  call DrupalSetRootDir()
+  if exists('a:1')
+    let l:context = a:1
+  else
+    let l:context = 'g'
+  endif
+
+  if l:context == 'g'
+    let l:command = 'cd'
+  elseif l:context == 'l'
+    let l:command = 'lcd'
+  endif
+
+  exec l:command . ' ' . b:DrupalRoot
+endfunction
+
+function! DrupalSetTags()
+  call DrupalSetRootDir()
+  let l:tags = b:DrupalRoot . '/tags'
+  if file_readable(l:tags)
+    exec 'setlocal tags+=' . l:tags
+  else
+    echomsg 'tags file is not exists, run DrupalCreateTags command to create it!'
+  endif
+endfunction
+
+function! DrupalCreateTags()
+  call DrupalSetRootDir()
+  exec '!cd ' . b:DrupalRoot . '; ctags'
+  echomsg 'tags file for Drupal project created.'
+  call DrupalSetTags()
 endfunction
 
 " commands
-command! -nargs=1 DrupalFuncSearch call DrupalFuncSearch(<f-args>)
 command! -nargs=* DrupalSetRootDir call DrupalSetRootDir(<f-args>)
+command! Dcd call DrupalCdDrupalRoot()
+command! Dlcd call DrupalCdDrupalRoot('l')
+command! DrupalSetTags call DrupalSetTags()
+command! DrupalCreateTags call DrupalCreateTags()
