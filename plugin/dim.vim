@@ -5,6 +5,7 @@ if has("autocmd")
     autocmd BufRead,BufNewFile *.{module,install,test,inc,profile,php} setlocal textwidth=80
     autocmd BufRead,BufNewFile *.{module,install,test,inc,profile,php} setlocal formatoptions=clorq
     autocmd BufRead,BufNewFile *.{module,install,test,inc,profile,php} call DrupalSetTags()
+    autocmd BufRead,BufNewFile *.{module,install,test,inc,profile,php} setlocal syntax=php.doxygen
   augroup END
 endif
 
