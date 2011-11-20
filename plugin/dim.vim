@@ -2,10 +2,9 @@ if has("autocmd")
   " Drupal php files.
   augroup module
     autocmd BufRead,BufNewFile *.{module,install,test,inc,profile} set filetype=php
-    autocmd BufRead,BufNewFile *.{module,install,test,inc,profile,php} setlocal textwidth=80
-    autocmd BufRead,BufNewFile *.{module,install,test,inc,profile,php} setlocal formatoptions=clorq
-    autocmd BufRead,BufNewFile *.{module,install,test,inc,profile,php} call DrupalSetTags()
-    autocmd BufRead,BufNewFile *.{module,install,test,inc,profile,php} setlocal syntax=php.doxygen
+    autocmd FileType php setlocal textwidth=80
+    autocmd FileType php setlocal formatoptions=clorq
+    autocmd FileType php call DrupalSetTags()
   augroup END
 endif
 
