@@ -61,6 +61,7 @@ function! DrupalCdDrupalRoot(...)
   endif
 
   exec l:command . ' ' . b:DrupalRoot
+  pwd
 endfunction
 
 function! DrupalSetTags()
