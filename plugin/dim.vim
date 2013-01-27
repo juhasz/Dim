@@ -9,6 +9,26 @@ if has("autocmd")
   augroup END
 endif
 
+if has("cscope")
+
+  function! DrupalCreateCscope()
+    call DrupalSetRootDir()
+    cs kill 0
+    exec '!find '  . b:DrupalRoot . ' -name \*.php > /tmp/csfiles && cscope -b -i /tmp/csfiles'
+    exec '!find '  . b:DrupalRoot . ' -name \*.js >> /tmp/csfiles && cscope -b -i /tmp/csfiles'
+    exec '!find '  . b:DrupalRoot . ' -name \*.module >> /tmp/csfiles && cscope -b -i /tmp/csfiles'
+    exec '!find '  . b:DrupalRoot . ' -name \*.info >> /tmp/csfiles && cscope -b -i /tmp/csfiles'
+    exec '!find '  . b:DrupalRoot . ' -name \*.install >> /tmp/csfiles && cscope -b -i /tmp/csfiles'
+    exec '!find '  . b:DrupalRoot . ' -name \*.inc >> /tmp/csfiles && cscope -b -i /tmp/csfiles'
+    exec '!find '  . b:DrupalRoot . ' -name \*.test >> /tmp/csfiles && cscope -b -i /tmp/csfiles'
+    exec '!find '  . b:DrupalRoot . ' -name \*.profile >> /tmp/csfiles && cscope -b -i /tmp/csfiles'
+    exec '!find '  . b:DrupalRoot . ' -name \*.make >> /tmp/csfiles && cscope -b -i /tmp/csfiles'
+    cs add .
+    !rm -f /tmp/csfiles
+  endfunction
+  command! DrupalCreateCscope call DrupalCreateCscope()
+endif
+
 " functions
 function! DrupalSetRootDir(...)
   if exists('a:1')
